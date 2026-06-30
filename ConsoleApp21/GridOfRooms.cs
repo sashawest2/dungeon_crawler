@@ -65,14 +65,14 @@ public class GridOfRooms
     
     }
 
-    // private bool IsOccupied(int row, int column)
-    // {
-    //     if (IsMaelstrom(row, column) || IsPit(row, column) || IsFountain(row, column))
-    //     {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    private bool IsOccupied(int row, int column)
+    {
+        if (IsMaelstrom(row, column) || IsPit(row, column) || IsFountain(row, column))
+        {
+            return true;
+        }
+        return false;
+    }
 
     private GamePlayEntity GetMaelstrom(int row, int column)
     {
