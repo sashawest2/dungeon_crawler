@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using ConsoleApp21;
+using Type = System.Type;
 
 
 GridOfRooms grid = Helper.PrepareGrid();
@@ -11,13 +12,13 @@ int targetColumn = 0;
 int amountOfArrows = 5;
 bool isFountainEnabled = false;
 
-do
+while (true)
 {
     if (grid.IsOutOfArrows(amountOfArrows))
     {
         Helper.Message("You out of arrows so you can no longer shoot monsters.");
     }
-    if (!grid.IsMaelstrom(currentRow, currentColumn))
+    if (!grid.IsGameplayEntity(currentRow, currentColumn, GridOfRooms.Maelstrom))
     {
         Helper.Message($"You are in the room at (Row={currentRow}, Column={currentColumn}).");
     }
@@ -37,7 +38,7 @@ do
         }
     }
 
-    if (grid.IsAmarok(currentRow, currentColumn))
+    if (grid.IsGameplayEntity(currentRow, currentColumn, GridOfRooms.Amarok))
     {
         Helper.Message("You are in the room with amarok, he kills you", 
             ConsoleColor.DarkRed);
@@ -51,7 +52,7 @@ do
             ConsoleColor.Yellow);
     }
     
-    if (grid.IsFountain(currentRow, currentColumn))
+    if (grid.IsGameplayEntity(currentRow, currentColumn, GridOfRooms.Fountain))
     {
         if (!isFountainEnabled)
         {
@@ -65,7 +66,7 @@ do
         }
     }
 
-    if (grid.IsPit(currentRow, currentColumn))
+    if (grid.IsGameplayEntity(currentRow, currentColumn, GridOfRooms.Pit))
     {
         Helper.Message("You've died in the pit, game over.");
         break;
@@ -78,7 +79,7 @@ do
 
  
     
-    if (grid.IsMaelstrom(currentRow, currentColumn))
+    if (grid.IsGameplayEntity(currentRow, currentColumn, GridOfRooms.Maelstrom))
     { 
         Helper.Message($"You are in the room at (Row={currentRow}, Column={currentColumn}).");
        grid.TeleportMaelstrom(currentRow, currentColumn);
@@ -109,47 +110,31 @@ do
     switch (userInput)
     {
         case "move east":
-            if (currentColumn != grid._gridSize - 1)
+            if (!grid.IsNearBorder(currentColumn))
             {
                 currentColumn += 1;
             }
-            else
-            {
-                Helper.Message("Your input out of range.");
-            }
             break;
         case "move west":
-            if (currentColumn != 0)
+            if (!grid.IsNearBorder(currentColumn))
             {
                 currentColumn -= 1;
             }
-            else
-            {
-                Helper.Message("Your input out of range.");
-            }
             break;
         case "move north":
-            if (currentRow != 0)
+            if (!grid.IsNearBorder(currentRow))
             {
                 currentRow -= 1;
             }
-            else
-            {
-                Helper.Message("Your input out of range.");
-            }
             break;
         case "move south":
-            if (currentRow != grid._gridSize - 1)
+            if (!grid.IsNearBorder(currentRow))
             {
                 currentRow += 1;
             }
-            else
-            {
-                Helper.Message("Your input out of range.");
-            }
             break;
         case "enable fountain":
-            if (grid.IsFountain(currentRow, currentColumn))
+            if (grid.IsGameplayEntity(currentRow, currentColumn, GridOfRooms.Fountain))
             {
                isFountainEnabled = true;
             }
@@ -157,114 +142,54 @@ do
         case "shoot north":
         {
             targetRow = currentRow;
-            targetColumn = currentColumn;
             
-            if (currentRow != 0)
-            {
-                targetRow -= 1;
-                if (grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn))
-                {
-                    Helper.Message("You defeated a monster.", ConsoleColor.DarkRed);
-                }
-                else if (amountOfArrows != 0)
-                {
-                    Helper.Message("You didn't shot a monster.", ConsoleColor.Cyan);
-                }
-            }
-            else
-            {
-                Helper.Message("You hear that your arrow went somewhere out of the forest");
-            }
-            
-            if (amountOfArrows > 0)
+            if (!grid.IsNearBorder(currentRow) && !grid.IsOutOfArrows(amountOfArrows))
             {
                 amountOfArrows -= 1; 
+                targetRow -= 1;
+                
+                grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn);
             }
         }
            break;
         case "shoot south":
         {
             targetRow = currentRow;
-            targetColumn = currentColumn;
             
-            if (currentRow != grid._gridSize - 1)
-            {
-                targetRow += 1;
-                if (grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn))
-                {
-                    Helper.Message("You defeated a monster.", ConsoleColor.DarkRed);
-                }
-                else if (amountOfArrows != 0)
-                {
-                    Helper.Message("You didn't shot a monster.", ConsoleColor.Cyan);
-                }
-            }
-            else
-            {
-                Helper.Message("You hear that your arrow went somewhere out of the forest");
-            }
-            
-            if (amountOfArrows > 0)
+            if (!grid.IsNearBorder(currentRow) && !grid.IsOutOfArrows(amountOfArrows))
             {
                 amountOfArrows -= 1; 
+                targetRow += 1;
+                
+                grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn);
             }
         }
             break;
         case "shoot east":
         {
-            targetRow = currentRow;
             targetColumn = currentColumn;
 
-            if (currentColumn != grid._gridSize - 1)
-            {
-                targetColumn += 1;
-                if (grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn))
-                {
-                    Helper.Message("You defeated a monster.", ConsoleColor.DarkRed);
-                }
-                else if (amountOfArrows != 0)
-                {
-                    Helper.Message("You didn't shot a monster.", ConsoleColor.Cyan);
-                }
-            }
-            else
-            {
-                Helper.Message("You hear that your arrow went somewhere out of the forest");
-            }
-            
-            if (amountOfArrows > 0)
+            if (!grid.IsNearBorder(currentColumn) && !grid.IsOutOfArrows(amountOfArrows))
             {
                 amountOfArrows -= 1; 
+                targetColumn += 1;
+                
+                grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn);
             }
             break;
         }
         case "shoot west":
         {
-            targetRow = currentRow;
             targetColumn = currentColumn;
             
-            if (currentColumn != 0)
-            {
-                targetColumn -= 1;
-                if (grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn))
-                {
-                    Helper.Message("You defeated a monster.", ConsoleColor.DarkRed);
-                }
-                else if (amountOfArrows != 0)
-                {
-                    Helper.Message("You didn't shot a monster.", ConsoleColor.Cyan);
-                }
-            }
-            else
-            {
-                Helper.Message("You hear that your arrow went somewhere out of the forest");
-            }
-            
-            if (amountOfArrows > 0)
+            if (!grid.IsNearBorder(currentColumn) && !grid.IsOutOfArrows(amountOfArrows))
             {
                 amountOfArrows -= 1; 
+                targetColumn -= 1;
+                
+                grid.IsMonsterShot(amountOfArrows, targetRow, targetColumn);
             }
             break;
         }
     }
-} while (true);
+}

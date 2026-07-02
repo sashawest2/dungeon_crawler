@@ -4,16 +4,16 @@ public class GridOfRooms
 {
     private string?[,] rooms;
     
-    private const string Maelstrom = "Maelstrom";
-    private const string Pit = "Pit";
-    private const string Fountain = "Fountain";
-    private const string Amarok = "Amarok";
+    public const string Maelstrom = "Maelstrom"; 
+    public const string Pit = "Pit";
+    public const string Fountain = "Fountain";
+    public const string Amarok = "Amarok";
  
     private List<GamePlayEntity> pits = new();
     private List<GamePlayEntity> maelstroms = new();
     private List<GamePlayEntity> amaroks = new();
 
-    private class GamePlayEntity
+    public class GamePlayEntity
     {
         public int Row { get; set; }
         public int Column { get; set; }
@@ -34,12 +34,21 @@ public class GridOfRooms
         _gridSize = row;
     }
     
-
-    public void SetMaelstrom(int row, int column)
+    public bool IsNearBorder(int coordinate)
     {
-            rooms[row, column] = "Maelstrom";
-            GamePlayEntity m = new GamePlayEntity(row, column, Type.Maelstrom);
-            maelstroms.Add(m);
+        if (coordinate == 0 || coordinate == _gridSize - 1)
+        {
+            Helper.Message("Your input out of range.");
+            return true;
+        }
+        return false;
+    }
+    
+    public void SetMaelstrom(int row, int column)
+    { 
+        rooms[row, column] = "Maelstrom";
+        GamePlayEntity m = new GamePlayEntity(row, column, Type.Maelstrom);
+        maelstroms.Add(m);
     }
 
     public void SetAmarok(int row, int column)
@@ -48,8 +57,7 @@ public class GridOfRooms
         GamePlayEntity a = new GamePlayEntity(row, column, Type.Amarok);
         amaroks.Add(a);
     }
-
-
+    
     public void TeleportMaelstrom(int row, int column)
     {
         int tempColumn = (column + 2) % _gridSize;
@@ -59,44 +67,22 @@ public class GridOfRooms
 
  
             rooms[tempRow, tempColumn] = "Maelstrom";
-            var currentMaelstrom = GetMaelstrom(row, column);
+            var currentMaelstrom = GetGamePlayEntity(row, column, maelstroms);
             currentMaelstrom.Row = row;
             currentMaelstrom.Column = column;
     
     }
 
-    private bool IsOccupied(int row, int column)
+    private GamePlayEntity GetGamePlayEntity(int row, int column, List<GridOfRooms.GamePlayEntity> gameplayEntities)
     {
-        if (IsMaelstrom(row, column) || IsPit(row, column) || IsFountain(row, column))
+        foreach (var gameplayEntity in gameplayEntities)
         {
-            return true;
-        }
-        return false;
-    }
-
-    private GamePlayEntity GetMaelstrom(int row, int column)
-    {
-        foreach (var maelstrom in maelstroms)
-        {
-            if (maelstrom.Row == row && maelstrom.Column == column)
+            if (gameplayEntity.Row == row && gameplayEntity.Column == column)
             {
-                return maelstrom;
+                return gameplayEntity;
             }
         }
-
-        throw new Exception("Maelstrom not found");
-    }
-
-    private GamePlayEntity GetAmarok(int row, int column)
-    {
-        foreach (var amarok in amaroks)
-        {
-            if (amarok.Row == row && amarok.Column == column)
-            {
-                return amarok;
-            }
-        }
-        throw new Exception("Amarok not found");
+        throw new Exception("Gameplay Entity not found");
     }
 
     public void TeleportPlayer(ref int row, ref int column)
@@ -121,7 +107,6 @@ public class GridOfRooms
                 column += 1;
             }
         }
-        
     }
     
     public void SetPit(int row, int column)
@@ -135,101 +120,53 @@ public class GridOfRooms
     {
         rooms[row, column] = "Fountain";
     }
+    
 
-    public bool IsFountain(int row, int column)
+    public bool IsGameplayEntity(int row, int column, string type)
     {
-        return rooms[row, column] == "Fountain";
+        return rooms[row, column] == type;
     }
-
-    public bool IsMaelstrom(int row, int column)
-    {
-        return rooms[row, column] == "Maelstrom";
-    }
-
-    public bool IsAmarok(int row, int column)
-    {
-        return rooms[row, column] == "Amarok";
-    }
-
-    public bool IsPit(int row, int column)
-    {
-        return rooms[row, column] == "Pit";
-    }
-
+    
     public bool IsOutOfArrows(int amountOfArrows)
     {
-        return amountOfArrows == 0;
+        if (amountOfArrows == 0)
+        {
+            Console.WriteLine("You are out of arrows.");
+            return true;
+        }
+        return false;
     }
 
     public bool IsMonsterShot(int amountOfArrows, int row, int column)
     {
-        if (!IsOutOfArrows(amountOfArrows))
-        {
-            if (IsAmarok(row, column))
+            if (IsGameplayEntity(row, column, GridOfRooms.Amarok))
             {
-                var currentAmarok = GetAmarok(row, column);
+                var currentAmarok = GetGamePlayEntity(row, column, amaroks);
                 amaroks.Remove(currentAmarok);
                 rooms[row, column] = "";
+                Helper.Message("You defeated a monster.", ConsoleColor.DarkRed);
                 
                 return true;
             }
-        }
-        return false;
+            else
+            {
+                Helper.Message("You didn't shot a monster.", ConsoleColor.Cyan);
+                return false;
+            }
     }
-
+    
     public bool IsNearAmarok(int row, int column)
     {
-        foreach (GamePlayEntity a in amaroks)
-        {
-            for (int c = a.Column - 1; c <= a.Column + 1; c++)
-            {
-                for (int r = a.Row - 1; r <= a.Row + 1; r++)
-                {
-                    if (c == column && r == row)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return Helper.IsNearGameplayEntity(row, column, amaroks);
     }
 
     public bool IsNearPit(int row, int column)
     {
-        foreach (GamePlayEntity p in pits)
-        {
-            for (int c = p.Column - 1; c <= p.Column + 1; c++)
-            {
-                for (int r = p.Row - 1; r <= p.Row + 1; r++)
-                {
-                    if (c == column && r == row)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return Helper.IsNearGameplayEntity(row, column, pits);
     }
 
     public bool IsNearMaelstrom(int row, int column)
     {
-        foreach (GamePlayEntity m in maelstroms)
-        {
-            for (int c = m.Column - 1; c <= m.Column + 1; c++)
-            {
-                for (int r = m.Row - 1; r <= m.Row + 1; r++)
-                {
-                    if (c == column && r == row)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+       return Helper.IsNearGameplayEntity(row, column, maelstroms);
     }
-
- 
 }
