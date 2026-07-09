@@ -1,26 +1,6 @@
 namespace ConsoleApp21;
 public static class Helper
 {
-   public static bool IsNearGameplayEntity(int row, int column, List<GridOfRooms.GamePlayEntity> gameplayEntities)
-   {
-      foreach (GridOfRooms.GamePlayEntity a in gameplayEntities)
-      {
-         for (int c = a.Column - 1; c <= a.Column + 1; c++)
-         {
-            for (int r = a.Row - 1; r <= a.Row + 1; r++)
-            {
-               if (c == column && r == row)
-               {
-                  return true;
-               }
-            }
-         }
-      }
-      return false;
-   }
-
-  
-
    public static void ChooseChallenge(string userInput)
    {
       switch (userInput)
