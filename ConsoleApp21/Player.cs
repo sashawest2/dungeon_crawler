@@ -4,6 +4,8 @@ public class Player
 {
     public int CurrentRow { get; set; }
     public int CurrentColumn { get; set; }
+    
+    public bool IsGettingArmed = false;
     public int AmountOfArrows { get; set; } = 5;
     
 

@@ -35,9 +35,19 @@ public class GridOfRooms
         _gridSize = row;
     }
     
-    public bool IsNearBorder(int coordinate)
+    public bool IsZeroCoordinate(int targetRow, int targetColumn)
     {
-        if (coordinate == 0 || coordinate == _gridSize - 1)
+        if (targetRow == -1 || targetColumn == -1)
+        {
+            Helper.Message("Your input out of range.");
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsLastCoordinate(int targetRow, int targetColumn)
+    {
+        if (targetRow == _gridSize || targetColumn == _gridSize)
         {
             Helper.Message("Your input out of range.");
             return true;
