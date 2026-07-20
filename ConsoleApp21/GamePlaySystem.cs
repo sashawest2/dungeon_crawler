@@ -45,6 +45,9 @@ public class GamePlaySystem
 
             Helper.Message("----------------------------------------------------------------------------------");
 
+
+            
+            
             if (userInput.Contains("move"))
             {
                 var coordinates = player.MoveInput(userInput);
@@ -75,6 +78,11 @@ public class GamePlaySystem
             {
                 EnableFountain();
             }
+            
+            else if (userInput.Contains("help"))
+            {
+                PrintAvailableCommands();
+            }
             else
             {
                 Helper.Message("Invalid input");
@@ -101,10 +109,48 @@ public class GamePlaySystem
 
     public void PrintAvailableCommands()
     {
-        if (player.IsGettingArmed)
+        Helper.Message("Available commands:", ConsoleColor.DarkGreen);
+        if (player.CurrentRow + 1 != grid._gridSize)
         {
-            Console.Write("you can: shoot (north, south, west, east)");
+            Helper.Message("Move south", ConsoleColor.DarkGreen);
+            if (player.IsGettingArmed)
+            {
+                Helper.Message("Shoot south", ConsoleColor.DarkGreen);
+            }
         }
+
+        if (player.CurrentColumn + 1 != grid._gridSize)
+        {
+            Helper.Message("Move east", ConsoleColor.DarkGreen);
+            if (player.IsGettingArmed)
+            {
+                Helper.Message("Shoot east", ConsoleColor.DarkGreen);
+            }
+        }
+
+        if (player.CurrentRow - 1 >= 0)
+        {
+            Helper.Message("Move north", ConsoleColor.DarkGreen);
+            if (player.IsGettingArmed)
+            {
+                Helper.Message("Shoot north", ConsoleColor.DarkGreen);
+            }
+        }
+
+        if (player.CurrentColumn - 1 >= 0)
+        {
+            Helper.Message("Move west", ConsoleColor.DarkGreen);
+            if (player.IsGettingArmed)
+            {
+                Helper.Message("Shoot west", ConsoleColor.DarkGreen);
+            }
+        }
+
+        if (IsFountain() && !isFountainEnabled)
+        {
+            Helper.Message("Enable fountain", ConsoleColor.DarkGreen);
+        }
+        
     }
 
     private void TeleportPlayer()

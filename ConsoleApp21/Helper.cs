@@ -6,6 +6,7 @@ public static class Helper
       Console.ForegroundColor = color;
       Console.WriteLine(message);
    }
+   
 
    private static string UserInput()
    {
@@ -36,16 +37,23 @@ public static class Helper
                if (userChallengeSmall.Contains("pits"))
                {
                   gridOfRooms.SetPit(3, 3);
+                  Message("Look out for pits. You will feel a breeze if a pit is in an adjacent room. \n" +
+                                 "If you enter a room with a pit, you will die.", ConsoleColor.DarkYellow);
                }
 
                if (userChallengeSmall.Contains("maelstroms"))
                {
                   gridOfRooms.SetMaelstrom(2,1); 
+                  Message("Maelstroms are violent forces of sentient wind. \n" +
+                                 "Entering a room with one could transport you to any other location in the caverns. \n" +
+                                 "You will be able to hear their growling and groaning in nearby rooms.", ConsoleColor.DarkYellow);
                }
 
                if (userChallengeSmall.Contains("amaroks"))
                {
                   gridOfRooms.SetAmarok(2,0);
+                  Message("Amaroks roam the caverns. Encountering one is certain death, \n" +
+                          "but you can smell their rotten stench in nearby rooms.", ConsoleColor.DarkYellow);
                   
                }
                break;
