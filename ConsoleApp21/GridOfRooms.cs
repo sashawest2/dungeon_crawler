@@ -35,25 +35,6 @@ public class GridOfRooms
         _gridSize = row;
     }
     
-    public bool IsZeroCoordinate(int targetRow, int targetColumn)
-    {
-        if (targetRow == -1 || targetColumn == -1)
-        {
-            Helper.Message("Your input out of range.");
-            return true;
-        }
-        return false;
-    }
-
-    public bool IsLastCoordinate(int targetRow, int targetColumn)
-    {
-        if (targetRow == _gridSize || targetColumn == _gridSize)
-        {
-            Helper.Message("Your input out of range.");
-            return true;
-        }
-        return false;
-    }
 
     public void RemoveAmarok(int row, int column)
     {

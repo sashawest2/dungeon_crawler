@@ -36,7 +36,7 @@ public class GamePlaySystem
                        "Find the Fountain of Objects, activate it, and return to the entrance.", ConsoleColor.Magenta);
       
         MovePossibilityCheck();
-        TextOutput();
+        PrintStatus();
         while (true)
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -44,35 +44,49 @@ public class GamePlaySystem
             string userInput = Console.ReadLine().Trim().ToLower();
 
             Helper.Message("----------------------------------------------------------------------------------");
-
-
-            
             
             if (userInput.Contains("move"))
             {
                 var coordinates = player.MoveInput(userInput);
-
-                Move(coordinates.Item1, coordinates.Item2);
+                
+                if (coordinates == null)
+                {
+                    Helper.Message("Invalid input", ConsoleColor.Red);
+                }
+                else
+                {
+                    Move(coordinates.Value.Item1, coordinates.Value.Item2);
            
-                bool moveResult = MovePossibilityCheck();
-                if (moveResult)
-                {
-                    TextOutput();
+                    bool moveResult = MovePossibilityCheck();
+                
+                
+                    if (moveResult)
+                    {
+                        PrintStatus();
+                    }
+                    if (!moveResult)
+                    {
+                        break;
+                    }
                 }
-                if (!moveResult)
-                {
-                    break;
-                }
+                
             }
             else if (player.IsGettingArmed && userInput.Contains("shoot"))
             {
-          
                 if (player.ShootPossibilityCheck())
                 {
                     var coordinates = player.ShootInput(userInput);
-                    Shoot(coordinates.Item1, coordinates.Item2);
-                    TextOutput();
+                    
+                    if (coordinates == null)
+                    {
+                        Helper.Message("Invalid input", ConsoleColor.Red);
+                    }
+                    else
+                    {
+                        Shoot(coordinates.Value.Item1, coordinates.Value.Item2);
+                    }
                 }
+             
             }
             else if (userInput.Contains("enable"))
             {
@@ -85,13 +99,13 @@ public class GamePlaySystem
             }
             else
             {
-                Helper.Message("Invalid input");
-                TextOutput();
+                Helper.Message("Invalid input", ConsoleColor.Red);;
             }
+            PrintStatus();
         }
     }
 
-    private void TextOutput()
+    private void PrintStatus()
     {
         if (!grid.IsGameplayEntity(player.CurrentRow, player.CurrentColumn, GridOfRooms.Maelstrom))
         {
@@ -183,7 +197,7 @@ public class GamePlaySystem
         {
             Helper.Message("You hear the rushing waters from the Fountain of Objects. It has been reactivated!",
                 ConsoleColor.Blue);
-            TextOutput();
+            PrintStatus();
             isFountainEnabled = true;
         }
         else
@@ -270,23 +284,17 @@ public class GamePlaySystem
 
     private void Shoot(int targetRow, int targetColumn)
     {
-        if (player.CurrentRow > targetRow || player.CurrentColumn > targetColumn)
+
+        if (targetRow < grid._gridSize && targetColumn < grid._gridSize
+                                     && targetRow >= 0 && targetColumn >= 0)
         {
-            if (!grid.IsZeroCoordinate(targetRow, targetColumn))
-            {
                 player.AmountOfArrows -= 1;
                 IsMonsterShot(targetRow, targetColumn);
-            }
             
         }
-
-        if (player.CurrentRow < targetRow || player.CurrentColumn < targetColumn)
+        else
         {
-            if (!grid.IsLastCoordinate(targetRow, targetColumn))
-            {
-                player.AmountOfArrows -= 1;
-                IsMonsterShot(targetRow, targetColumn);
-            }
+            Console.WriteLine("Invalid input");
         }
     }
 
